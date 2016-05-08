@@ -1,0 +1,9 @@
+/**/*
+!/index.ts
+!/package.json
+!/tsconfig.json
+!/typings.json
+!/.npmignore
+!/.gitignore
+!/.travis.yml
+!/test.js

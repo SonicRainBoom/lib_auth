@@ -1,0 +1,19 @@
+{
+  "name": "lib_auth",
+  "main": "index.js",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "jsonwebtoken": "^6.2.0",
+    "lib_crypto": "github:sonicrainboom/lib_crypto",
+    "lib_srbevent": "github:sonicrainboom/lib_srbevent"
+  },
+  "scripts": {
+    "postinstall": "typings i && tsc -p .",
+    "test": "node ./test.js"
+  },
+  "devDependencies": {
+    "typescript": "^1.8.10",
+    "typings": "^0.8.1"
+  }
+}
