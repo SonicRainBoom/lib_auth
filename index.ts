@@ -5,6 +5,24 @@ import {KeyStore} from 'lib_crypto';
 export {KeyStore};// from 'lib_crypto';
 import jwt = require('jsonwebtoken');
 
+export type Timestamp = number;
+
+export interface JWT {
+  iat?: Timestamp
+  nbf?: Timestamp
+  exp?: Timestamp
+  aud?: string | string[]
+  iss?: string
+  sub?: string
+}
+
+export interface enrichedJWT extends JWT{
+  type?: string
+  dummy?: boolean
+  payload?: {}
+  roles?: string[]
+}
+
 /**
  * TrustStore-interface.
  * Compatible with any KV-Store implementation that returns null/undefined
@@ -66,7 +84,7 @@ export class ServerAuthentication {
 
   verifyToken = (token: string,
                  forcedIssuer: string,
-                 forcedTokenType: string): any => {
+                 forcedTokenType: string): enrichedJWT => {
     let issuer: string    = forcedIssuer || this.extractIssuer(token);
     let tokenType: string = forcedTokenType || this.extractTokenType(token);
 
@@ -76,7 +94,7 @@ export class ServerAuthentication {
 
     let pubKey = this.trustStore.get(issuer);
     try {
-      let validatedToken = jwt.verify(
+      let validatedToken = <enrichedJWT> jwt.verify(
         token,
         pubKey,
         {audience: this.type}
@@ -84,22 +102,24 @@ export class ServerAuthentication {
 
       if (validatedToken.type != tokenType) {
         SRBEvent.error(new Error('tokenType invalid!'));
-        return false;
+        return null;
       }
 
       return validatedToken;
     } catch (err) {
       SRBEvent.error(err);
-      return false;
+      return null;
     }
   };
 
   issueToken = (subject: string,
-                content?: any,
+                content?: enrichedJWT,
+                roles?: string[],
                 expiresIn?: string|number,
                 type?: string): Promise<string> => {
     content             = content || {};
-    content['type']     = type || this.type;
+    content.type        = type || this.type;
+    content.roles       = roles || [];
     let properties: any = {
       issuer   : this.keyStore.publicFingerprint,
       algorithm: 'RS512',
@@ -120,7 +140,6 @@ export class ServerAuthentication {
             if (err) {
               reject(err)
             } else {
-              //SRBEvent.debug(jwt.decode(token));
               resolve(token);
             }
           }
