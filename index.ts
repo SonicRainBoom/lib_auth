@@ -136,7 +136,7 @@ export class ServerAuthentication {
           content || {},
           this.keyStore.exportPrivateKey(),
           properties,
-          (err, token) => {
+          (err: Error, token: string) => {
             if (err) {
               reject(err)
             } else {
