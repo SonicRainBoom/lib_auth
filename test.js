@@ -46,6 +46,7 @@ tests.push(
       sa.issueToken(
         'central',
         {isAdmin: true, dummy: true},
+        [],
         '20s',
         'someType'
       ).then(
@@ -73,6 +74,7 @@ tests.push(
       sa.issueToken(
         'central',
         {isAdmin: true, dummy: true},
+        [],
         '20s',
         'someType'
       ).then(
