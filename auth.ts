@@ -2,7 +2,7 @@
 
 import {SRBEvent} from 'lib_srbevent';
 import {KeyStore} from 'lib_crypto';
-export {KeyStore};// from 'lib_crypto';
+export {KeyStore};
 import jwt = require('jsonwebtoken');
 
 export type Timestamp = number;

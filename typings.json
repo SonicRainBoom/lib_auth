@@ -1,8 +1,8 @@
 {
-  "ambientDependencies": {
-    "node": "registry:dt/node#4.0.0+20160412142033"
-  },
   "dependencies": {
     "jsonwebtoken": "registry:npm/jsonwebtoken#5.5.4+20160208220328"
+  },
+  "globalDependencies": {
+    "node": "registry:dt/node#6.0.0+20160514165920"
   }
 }
