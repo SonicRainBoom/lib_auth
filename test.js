@@ -1,7 +1,6 @@
 'use strict';
 var auth     = require('./lib/auth');
 var crypto   = require('lib_crypto');
-var srbEvent = require('lib_srbevent');
 
 setTimeout(
   () => {
@@ -10,12 +9,12 @@ setTimeout(
   }, 30000
 );
 
-srbEvent.SRBEvent.info('generating key');
+console.info('generating key');
 let ks = crypto.KeyStore.generate(2048);
-srbEvent.SRBEvent.info('generating key done');
+console.info('generating key done');
 let ts = new Map();
 
-srbEvent.SRBEvent.debug('keystore ok');
+console.log('keystore ok');
 
 let cia = new auth.CentralInstanceAuthentication(ks, ts);
 let sia = new auth.SRBInstanceAuthentication(ks, ts);
@@ -88,7 +87,7 @@ tests.push(
           } catch (err) {
             reject(err);
           }
-          srbEvent.SRBEvent.debug(token, v);
+          console.log(token, v);
           if (!v) {
             reject(new Error('invalid token'));
             return;
@@ -110,6 +109,7 @@ Promise.all(tests).then(
   }
 ).catch(
   err=> {
-    srbEvent.SRBEvent.fatal(err);
+    console.error(err);
+    process.exit(1);
   }
 );

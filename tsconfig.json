@@ -1,24 +1,30 @@
 {
   "compileOnSave"  : true,
   "compilerOptions": {
-    "module"             : "commonjs",
-    "target"             : "es6",
-    "noImplicitAny"      : true,
-    "noImplicitReturns"  : true,
-    "noImplicitUseStrict": true,
-    "sourceMap"          : true,
-    "newLine"            : "lf",
-    "removeComments"     : true,
-    "listFiles"          : true,
-    "declaration"        : true,
-    "noLib"              : false,
-    "outDir"             : "lib"
+    "module"                        : "commonjs",
+    "target"                        : "es6",
+    "noImplicitAny"                 : true,
+    "noImplicitReturns"             : true,
+    "sourceMap"                     : true,
+    "newLine"                       : "lf",
+    "removeComments"                : true,
+    "listFiles"                     : false,
+    "declaration"                   : true,
+    "declarationDir"                : "tsd",
+    "noLib"                         : false,
+    "outDir"                        : "lib",
+    "strictNullChecks"              : false,
+    "alwaysStrict"                  : true,
+    "traceResolution"               : false,
+    "noUnusedLocals"                : true,
+    "noUnusedParameters"            : true,
+    "noFallthroughCasesInSwitch"    : false,
+    "allowUnusedLabels"             : true
   },
   "exclude"        : [
     "node_modules"
   ],
   "files"          : [
-    "typings/index.d.ts",
     "auth.ts"
   ]
 }

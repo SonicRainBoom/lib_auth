@@ -1,26 +1,24 @@
 {
-  "name"           : "lib_auth",
-  "version"        : "0.0.0",
-  "private"        : true,
-  "dependencies"   : {
+  "name": "lib_auth",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@types/jsonwebtoken": "^7.2.0",
     "jsonwebtoken": "^6.2.0",
-    "lib_crypto"  : "github:sonicrainboom/lib_crypto",
-    "lib_srbevent": "github:sonicrainboom/lib_srbevent"
+    "lib_crypto": "github:sonicrainboom/lib_crypto"
   },
-  "scripts"        : {
-    "postinstall": "typings i && tsc -p .",
-    "test"       : "node ./test.js"
+  "scripts": {
+    "postinstall": "tsc -p .",
+    "test": "node ./test.js"
   },
   "devDependencies": {
-    "typescript": "^1.8.10",
-    "typings"   : "^1.0.4"
+    "typescript": "^2.1"
   },
-  "main"           : "lib/auth.js",
-  "typings"        : "lib/auth",
-  "files"          : [
+  "main": "./lib/auth.js",
+  "typings": "./tsd/auth.d.ts",
+  "files": [
     "auth.ts",
     "test.js",
-    "tsconfig.json",
-    "typings.json"
+    "tsconfig.json"
   ]
 }

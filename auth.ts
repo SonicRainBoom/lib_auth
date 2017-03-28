@@ -1,9 +1,8 @@
 'use strict';
 
-import {SRBEvent} from 'lib_srbevent';
 import {KeyStore} from 'lib_crypto';
 export {KeyStore};
-import jwt = require('jsonwebtoken');
+import {decode, verify, sign} from 'jsonwebtoken';
 
 export type Timestamp = number;
 
@@ -41,7 +40,7 @@ export interface ITrustStore {
 export class ClientAuthentication {
   protected type = 'client';
 
-  constructor(private authToken: string) {
+  constructor(_authToken: string) {
     //TODO: Implement client auth.
   }
 }
@@ -73,12 +72,12 @@ export class ServerAuthentication {
   }
 
   extractIssuer = (token: string) => {
-    let decoded = jwt.decode(token);
+    let decoded = decode(token);
     return decoded.iss || false;
   };
 
   extractTokenType = (token: string) => {
-    let decoded = jwt.decode(token);
+    let decoded = decode(token);
     return decoded.type || false;
   };
 
@@ -92,24 +91,18 @@ export class ServerAuthentication {
       throw new Error('Issuer not in truststore');
     }
 
-    let pubKey = this.trustStore.get(issuer);
-    try {
-      let validatedToken = <enrichedJWT> jwt.verify(
-        token,
-        pubKey,
-        {audience: this.type}
-      );
+    let pubKey         = this.trustStore.get(issuer);
+    let validatedToken = <enrichedJWT> verify(
+      token,
+      pubKey,
+      {audience: this.type}
+    );
 
-      if (validatedToken.type != tokenType) {
-        SRBEvent.error(new Error('tokenType invalid!'));
-        return null;
-      }
-
-      return validatedToken;
-    } catch (err) {
-      SRBEvent.error(err);
-      return null;
+    if (validatedToken.type != tokenType) {
+      throw new Error('tokenType invalid!');
     }
+
+    return validatedToken;
   };
 
   issueToken = (subject: string,
@@ -132,7 +125,7 @@ export class ServerAuthentication {
     }
     return new Promise<string>(
       (resolve, reject) => {
-        return jwt.sign(
+        return sign(
           content || {},
           this.keyStore.exportPrivateKey(),
           properties,
