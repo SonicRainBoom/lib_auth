@@ -19,7 +19,11 @@
     "noUnusedLocals"                : true,
     "noUnusedParameters"            : true,
     "noFallthroughCasesInSwitch"    : false,
-    "allowUnusedLabels"             : true
+    "allowUnusedLabels"             : true,
+    "suppressImplicitAnyIndexErrors": true,
+    "skipLibCheck"                  : true,
+    "lib"                           : ["es7"],
+    "types"                         : ["node"]
   },
   "exclude"        : [
     "node_modules"

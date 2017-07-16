@@ -39,6 +39,7 @@ export interface ITrustStore {
  */
 export class ClientAuthentication {
   protected type = 'client';
+  protected targetAudience = ['srb'];
 
   constructor(_authToken: string) {
     //TODO: Implement client auth.
@@ -72,20 +73,44 @@ export class ServerAuthentication {
   }
 
   extractIssuer = (token: string) => {
-    let decoded = decode(token);
-    return decoded.iss || false;
+    let decoded = decode(token) as any;
+    return decoded && decoded.iss || false;
   };
 
   extractTokenType = (token: string) => {
-    let decoded = decode(token);
-    return decoded.type || false;
+    let decoded = decode(token) as any;
+    return decoded &&decoded.type || false;
+  };
+
+  matchesRole = (jwt: enrichedJWT, roleToMatch: string) => {
+    if(!jwt || !jwt.roles) {return false}
+    if(jwt.roles.includes(roleToMatch)){
+      return true;
+    }
+    if(roleToMatch.includes('*') || roleToMatch.includes('?')){
+      roleToMatch.replace('*', '.*');
+      roleToMatch.replace('?', '.');
+      const reg:RegExp = new RegExp(roleToMatch, 'gmi');
+      for (const role of jwt.roles) {
+        if (reg.test(role)) {return true;}
+      }
+    }
+    return false;
   };
 
   verifyToken = (token: string,
-                 forcedIssuer: string,
-                 forcedTokenType: string): enrichedJWT => {
-    let issuer: string    = forcedIssuer || this.extractIssuer(token);
-    let tokenType: string = forcedTokenType || this.extractTokenType(token);
+                 forcedIssuer?: string,
+                 forcedTokenType?: string,
+                 forcedAudience?: string
+  ): enrichedJWT => {
+    let decoded = decode(token) as any;
+    if (!decoded) {
+      throw new Error('malformatted token');
+    }
+
+    let issuer: string    = forcedIssuer || decoded.iss || false;
+    let tokenType: string = forcedTokenType || decoded.type || false;
+    let audience: string = forcedAudience || this.type;
 
     if (!this.trustStore.get(issuer)) {
       throw new Error('Issuer not in truststore');
@@ -95,11 +120,11 @@ export class ServerAuthentication {
     let validatedToken = <enrichedJWT> verify(
       token,
       pubKey,
-      {audience: this.type}
+      {audience: audience}
     );
 
     if (validatedToken.type != tokenType) {
-      throw new Error('tokenType invalid!');
+      throw new Error('tokenType invalid');
     }
 
     return validatedToken;
@@ -155,11 +180,26 @@ export class CentralInstanceAuthentication extends ServerAuthentication {
 }
 
 /**
+ * Used to issue a Stream token
+ */
+export class StreamAuthentication extends ServerAuthentication {
+  protected type           = 'stream';
+  protected targetAudience = ['stream'];
+
+  constructor(keyStore: KeyStore, trustStore: ITrustStore) {
+    super(keyStore, trustStore);
+  }
+  issueVFSToken = (subject: string): Promise<string> => {
+    return this.issueToken(subject, {}, ['vfs', 'stream.raw'], 0);
+  }
+}
+
+/**
  * Used in a SRB-instance to authenticate to a central or client.
  */
 export class SRBInstanceAuthentication extends ServerAuthentication {
   protected type           = 'srb';
-  protected targetAudience = ['srb', 'central'];
+  protected targetAudience = ['srb', 'central', 'stream'];
 
   constructor(keyStore: KeyStore, trustStore: ITrustStore) {
     super(keyStore, trustStore);
